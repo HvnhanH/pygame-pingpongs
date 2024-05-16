@@ -170,15 +170,19 @@ def draw_menu():
     background_suface=pygame.transform.scale(background_image,(WINDOW_WIDTH,WINDOW_HEIGHT))
     WIN.blit(background_suface,(0,0))
     command=0
-    play_btn=Button(WIN,'Play',(WINDOW_WIDTH//2 - 40 ,150))
-    play_btn.draw()
-    exit_btn=Button(WIN,'Exit',(WINDOW_WIDTH//2 -40 ,200))
+    play_btn1=Button(WIN,'Play 1P',(WINDOW_WIDTH//2 - 40 ,150))
+    play_btn1.draw()
+    play_btn2=Button(WIN,'Play 2P',(WINDOW_WIDTH//2 - 40 ,200))
+    play_btn2.draw()
+    exit_btn=Button(WIN,'Exit',(WINDOW_WIDTH//2 -40 ,250))
     exit_btn.draw()
     pygame.display.update()
-    if play_btn.check_clicked():
+    if play_btn1.check_clicked():
         command = 1
+    if play_btn2.check_clicked():
+        command = 2
     if exit_btn.check_clicked():
-        command = 2 
+        command = 3 
     return command
 
 def draw_pause():
@@ -188,7 +192,7 @@ def draw_pause():
     Resume_btn.draw()
     Restart_btn=Button(WIN,'Restart',(WINDOW_WIDTH//2 - 60 ,200))
     Restart_btn.draw()
-    quit_btn=Button(WIN,'Quit',(WINDOW_WIDTH//2 - 60 ,250))
+    quit_btn=Button(WIN,'Quit',(WINDOW_WIDTH//2 - 60 ,400))
     quit_btn.draw()
     pygame.display.update()
     if Resume_btn.check_clicked():
@@ -200,6 +204,12 @@ def draw_pause():
     pygame.display.update()
     return command
 
+#ham ai
+def handle_ai_movement(ball, right_player):
+    if ball.y < right_player.y and right_player.y - PLAYER_V >= 0:
+        right_player.move(up=True)
+    elif ball.y > right_player.y + right_player.height and right_player.y + PLAYER_V + PLAYER_HEIGHT <= WINDOW_HEIGHT:
+        right_player.move(up=False)
 
 def main():
     run = True
@@ -232,12 +242,19 @@ def main():
                     paused = not paused
                     time_item2=time.time()
                     time_item1=time.time()
+                    last_item_time = time.time()
 
         if main_menu:
             command = draw_menu()
             if command ==1:
+                single_player = True
                 main_menu=False
+                last_item_time = time.time()
             if command ==2:
+                single_player = False
+                main_menu=False
+                last_item_time = time.time()
+            if command == 3:
                 run=False
         else:
             if paused == True:
@@ -246,6 +263,7 @@ def main():
                     paused= not paused
                     time_item2=time.time()
                     time_item1=time.time()
+                    last_item_time = time.time()
                 if t_pause==2:
                     ball.reset()
                     left_player.reset()
@@ -253,6 +271,7 @@ def main():
                     left_score=0
                     right_score=0
                     items = []
+                    last_item_time = time.time()
                     paused= not paused
                 if t_pause==3:
                     ball.reset()
@@ -261,9 +280,11 @@ def main():
                     left_score=0
                     right_score=0
                     items = []
+                    last_item_time = time.time()
                     main_menu=True
 
                 continue
+            
             draw_game(WIN, [left_player,right_player], ball, left_score,right_score)
             #lay phim dc nhan
             keys = pygame.key.get_pressed()
@@ -271,12 +292,14 @@ def main():
 
             ball.move()
             handle_collision(WIN,ball,left_player,right_player,items,left_score,right_score)
-            if time.time() - last_item_time>10:
+            if time.time() - last_item_time>3:
                 if len(items)<5:
                     items.append(create_item())
                 last_item_time=time.time()
             draw_item(WIN,items)
                 
+            if single_player:
+                handle_ai_movement(ball,right_player)
 
             if ball.x <0:
                 right_score +=1
@@ -326,6 +349,8 @@ def main():
                 WIN.blit(text, (WINDOW_WIDTH//2 - text.get_width()//2, WINDOW_HEIGHT//2 - text.get_height()//2))
                 pygame.display.update()
                 pygame.time.delay(5000)
+                last_item_time=time.time()
+                items=[]
                 ball.reset()
                 left_player.reset()
                 right_player.reset()
