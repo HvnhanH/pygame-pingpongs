@@ -5,7 +5,7 @@ Ping Pong là một trò chơi điện tử cổ điển và phổ biến, đư�
 
 ## Giao diện chính của phần mềm
 ### Menu screen
-![Menu](images/trangchu.png)
+![Menu](images/menu.png)
 
 ### Play screen
 ![Play](images/manhinhchoi.png)
