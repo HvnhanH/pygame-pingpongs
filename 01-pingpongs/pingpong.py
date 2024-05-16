@@ -271,7 +271,7 @@ def main():
 
             ball.move()
             handle_collision(WIN,ball,left_player,right_player,items,left_score,right_score)
-            if time.time() - last_item_time>3:
+            if time.time() - last_item_time>10:
                 if len(items)<5:
                     items.append(create_item())
                 last_item_time=time.time()
